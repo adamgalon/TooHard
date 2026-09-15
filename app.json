@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Too Hard",
+    "slug": "TooHard",
+    "version": "1.0.0",
+    "scheme": "toohard",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.toohard.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take a daily progress photo without leaving the app.",
+        "NSPhotoLibraryUsageDescription": "Pick a progress photo from your library."
+      }
+    },
+    "android": {
+      "package": "com.toohard.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B0B0F",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "POST_NOTIFICATIONS", "VIBRATE"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0B0B0F",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Too Hard uses your photo library for daily progress photos.",
+          "cameraPermission": "Too Hard uses the camera for daily progress photos."
+        }
+      ],
+      "expo-notifications",
+      "expo-file-system"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
