@@ -15,7 +15,17 @@ module.exports = [
   ...expoConfig,
   prettier,
   {
-    ignores: ['node_modules/**', '.expo/**', 'dist/**', 'coverage/**', 'babel.config.js'],
+    // assets/brand is a standalone Node dev-utility (regenerates the app's
+    // icon/splash PNGs from SVG via `sharp`) — it's not app source, doesn't
+    // ship, and doesn't belong to the RN/TypeScript ruleset below.
+    ignores: [
+      'node_modules/**',
+      '.expo/**',
+      'dist/**',
+      'coverage/**',
+      'babel.config.js',
+      'assets/brand/**',
+    ],
   },
   {
     rules: {
