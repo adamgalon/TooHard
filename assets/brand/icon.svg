@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+      <defs>
+    <linearGradient id="g" x1="15%" y1="10%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#FF4D4D" />
+      <stop offset="100%" stop-color="#FF9F1C" />
+    </linearGradient>
+    
+    <radialGradient id="glow">
+      <stop offset="0%" stop-color="#FF9F1C" stop-opacity="0.30" />
+      <stop offset="60%" stop-color="#FF4D4D" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#FF4D4D" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+      <rect width="1024" height="1024" fill="#0B0B0F" />
+      
+    <circle cx="512" cy="512" r="527" fill="url(#glow)" />
+    <circle cx="512" cy="512" r="340" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="56" />
+    <circle
+      cx="512" cy="512" r="340" fill="none"
+      stroke="url(#g)" stroke-width="56" stroke-linecap="round"
+      stroke-dasharray="2136.2830044410593 2136.2830044410593"
+      stroke-dashoffset="469.982260977033"
+      transform="rotate(-90 512 512)"
+    />
+    <text
+      x="512" y="512" font-family="Helvetica Neue, Arial, sans-serif" font-weight="800"
+      font-size="300" fill="#FFFFFF" text-anchor="middle"
+      dominant-baseline="central" letter-spacing="-2"
+    >75</text>
+  
+    </svg>

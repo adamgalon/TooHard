@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+      <defs>
+    <linearGradient id="g" x1="15%" y1="10%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#FF4D4D" />
+      <stop offset="100%" stop-color="#FF9F1C" />
+    </linearGradient>
+    
+  </defs>
+      
+    
+    <circle cx="256" cy="256" r="130" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="22" />
+    <circle
+      cx="256" cy="256" r="130" fill="none"
+      stroke="url(#g)" stroke-width="22" stroke-linecap="round"
+      stroke-dasharray="816.8140899333462 816.8140899333462"
+      stroke-dashoffset="179.69909978533613"
+      transform="rotate(-90 256 256)"
+    />
+    <text
+      x="256" y="256" font-family="Helvetica Neue, Arial, sans-serif" font-weight="800"
+      font-size="116" fill="#FFFFFF" text-anchor="middle"
+      dominant-baseline="central" letter-spacing="-2"
+    >75</text>
+  
+    </svg>
