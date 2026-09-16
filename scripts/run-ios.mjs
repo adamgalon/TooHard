@@ -29,7 +29,17 @@ const listDevices = () => {
     encoding: 'utf8',
   });
   if (result.status !== 0) {
-    throw new Error(`xcrun simctl failed: ${result.stderr || result.stdout}`);
+    const stderr = result.stderr || result.stdout || '';
+    // An Xcode upgrade resets the licence agreement, and then every xcrun call
+    // fails. Say what to run rather than forwarding Apple's wall of text.
+    if (/license/i.test(stderr)) {
+      throw new Error(
+        'Xcode needs its licence accepted after an update. Run this once, then try again:\n\n' +
+          '    sudo xcodebuild -license accept\n' +
+          '    sudo xcodebuild -runFirstLaunch',
+      );
+    }
+    throw new Error(`xcrun simctl failed: ${stderr}`);
   }
   const { devices } = JSON.parse(result.stdout);
 
