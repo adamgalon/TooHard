@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
-import { ActivityIndicator, AppState, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer, type Theme as NavTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { AppSplash } from '@presentation/components/AppSplash';
 import { OnboardingScreen } from '@presentation/screens/OnboardingScreen';
 import { MainTabs } from '@presentation/navigation/MainTabs';
 import type { RootStackParamList } from '@presentation/navigation/types';
@@ -17,6 +18,16 @@ export const RootNavigator = () => {
   const dashboard = useChallenge((state) => state.dashboard);
   const bootstrap = useChallenge((state) => state.bootstrap);
   const loadSettings = useSettings((state) => state.load);
+
+  // Two independent conditions gate the splash, and both must clear before
+  // the app appears: the first sync/settings round trip has to resolve, and
+  // — regardless of how fast that is — AppSplash's entrance choreography has
+  // to finish playing. A device with warm storage should still see the full,
+  // deliberate reveal rather than a one-frame flash of it; a device with a
+  // slow cold read is kept company by AppSplash's breathing loop instead of
+  // a bare spinner.
+  const [introComplete, setIntroComplete] = useState(false);
+  const dataReady = !(phase === 'idle' || (phase === 'loading' && !dashboard));
 
   useEffect(() => {
     void loadSettings();
@@ -44,12 +55,8 @@ export const RootNavigator = () => {
     },
   };
 
-  if (phase === 'idle' || (phase === 'loading' && !dashboard)) {
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.colors.background, justifyContent: 'center' }}>
-        <ActivityIndicator color={theme.colors.accent} size="large" />
-      </View>
-    );
+  if (!dataReady || !introComplete) {
+    return <AppSplash onIntroComplete={() => setIntroComplete(true)} />;
   }
 
   return (
