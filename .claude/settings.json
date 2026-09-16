@@ -1,5 +1,35 @@
 {
   "enabledPlugins": {
-    "expo@claude-plugins-official": true
+    "expo@claude-plugins-official": true,
+    "nx@nx-claude-plugins": true
+  },
+  "extraKnownMarketplaces": {
+    "nx-claude-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "nrwl/nx-ai-agents-config"
+      }
+    }
+  },
+  "sandbox": {
+    "network": {
+      "allowedDomains": [
+        "www.google-analytics.com"
+      ],
+      "allowUnixSockets": [
+        "/tmp/.nx",
+        "~/.nx"
+      ]
+    },
+    "filesystem": {
+      "allowWrite": [
+        "/tmp/.nx",
+        "~/.nx"
+      ],
+      "allowRead": [
+        "/tmp/.nx",
+        "~/.nx"
+      ]
+    }
   }
 }

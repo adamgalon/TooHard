@@ -44,3 +44,7 @@ yarn-error.*
 .nx/cache
 .nx/workspace-data
 .nx/bundle-check
+
+.nx/polygraph
+.claude/worktrees
+.claude/settings.local.json
