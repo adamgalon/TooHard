@@ -169,14 +169,22 @@ Nothing else changes — not the entities, not the use cases, not persistence.
 onboarding automatically.
 
 **Cloud sync**: implement the three repository ports against your API and swap them in
-`createContainer`. No other file needs to know.
+`createContainer`. No other file needs to know — see [`docs/database.md`](docs/database.md)
+for a full walkthrough of four concrete options (local SQLite, Supabase, Firestore, a custom
+API), with the trade-offs and a recommendation.
+
+For a broader menu of where the app could go next — features, infrastructure, what it takes
+to actually ship this to a store — see [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Known gaps
 
-- Local-only: no sync, no export, no backup.
-- Photos are referenced by URI; there is no gallery or before/after comparison screen yet.
+- Local-only: no sync, no export, no backup. See [`docs/database.md`](docs/database.md) if
+  you want to change that.
+- Photos are referenced by URI; there is no gallery or before/after comparison screen yet
+  (see `docs/roadmap.md`'s "Quick wins").
 - Push notifications need a development build on Android (Expo Go dropped remote push in
-  SDK 53); the local daily reminder works everywhere.
+  SDK 53); the local daily reminder works everywhere. The splash screen's native fade
+  transition is similarly unavailable in Expo Go — see `AppSplash.tsx`.
 - No migration runner yet — `SCHEMA_VERSION` and the envelope in
   [`JsonDocument.ts`](src/infrastructure/persistence/JsonDocument.ts) are the hook for one.
 
