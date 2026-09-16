@@ -40,6 +40,12 @@ npx nx bundle             # prove it still bundles, without opening a simulator
 npx nx show project toohard --web   # every target, in a browser
 ```
 
+`npx nx ios` boots a simulator itself before handing over to Expo. Expo installs
+Expo Go with `xcrun simctl install`, which fails with *"Unable to lookup in current
+state: Shutdown"* when no device is booted, so [`scripts/run-ios.mjs`](scripts/run-ios.mjs)
+boots the newest available iPhone runtime and waits until it really reports `Booted`.
+Pick a specific device with `npx nx ios --device "iPhone 17 Pro"` or `IOS_SIMULATOR=…`.
+
 The plain npm scripts still work (`npm start`, `npm test`, `npm run verify`) — Nx
 wraps them rather than replacing them, and nothing was restructured to add it.
 Editing a `.md` file does not invalidate the cache, so docs churn never costs a
@@ -173,3 +179,19 @@ onboarding automatically.
   SDK 53); the local daily reminder works everywhere.
 - No migration runner yet — `SCHEMA_VERSION` and the envelope in
   [`JsonDocument.ts`](src/infrastructure/persistence/JsonDocument.ts) are the hook for one.
+
+## Troubleshooting
+
+**`simctl install … exited with non-zero code: 149` / "Unable to lookup in current
+state: Shutdown"** — no simulator was booted when Expo tried to install Expo Go. Use
+`npx nx ios`, which boots one first. To do it by hand:
+
+```bash
+xcrun simctl list devices available   # pick a UDID on a current runtime
+xcrun simctl boot <UDID> && open -a Simulator
+```
+
+Stale simulator state can also be cleared with `xcrun simctl shutdown all` followed by
+a fresh boot.
+
+**Metro serves an old bundle** — `npx expo start --clear`.

@@ -6,30 +6,48 @@
   "targets": {
     "start": {
       "executor": "nx:run-commands",
-      "options": { "command": "expo start", "color": true },
+      "options": {
+        "command": "expo start",
+        "color": true
+      },
       "description": "Start the Expo dev server (press i / a, or scan with Expo Go)"
     },
     "ios": {
       "executor": "nx:run-commands",
-      "options": { "command": "expo start --ios", "color": true },
-      "description": "Open the app in the iOS simulator"
+      "options": {
+        "command": "node scripts/run-ios.mjs",
+        "color": true
+      },
+      "description": "Boot a simulator, then open the app in it (pass --device \"iPhone 17 Pro\" to choose)"
     },
     "android": {
       "executor": "nx:run-commands",
-      "options": { "command": "expo start --android", "color": true },
+      "options": {
+        "command": "expo start --android",
+        "color": true
+      },
       "description": "Open the app on an Android emulator or device"
     },
     "typecheck": {
       "executor": "nx:run-commands",
-      "options": { "command": "tsc --noEmit", "color": true }
+      "options": {
+        "command": "tsc --noEmit",
+        "color": true
+      }
     },
     "lint": {
       "executor": "nx:run-commands",
-      "options": { "command": "eslint . --max-warnings=0", "color": true }
+      "options": {
+        "command": "eslint . --max-warnings=0",
+        "color": true
+      }
     },
     "test": {
       "executor": "nx:run-commands",
-      "options": { "command": "jest", "color": true }
+      "options": {
+        "command": "jest",
+        "color": true
+      }
     },
     "bundle": {
       "executor": "nx:run-commands",
@@ -41,7 +59,9 @@
     },
     "verify": {
       "executor": "nx:run-commands",
-      "options": { "commands": ["echo 'All checks passed.'"] },
+      "options": {
+        "commands": ["echo 'All checks passed.'"]
+      },
       "dependsOn": ["typecheck", "lint", "test"],
       "description": "Every quality gate in one command"
     }

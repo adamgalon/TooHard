@@ -14,36 +14,25 @@
       "{projectRoot}/app.json",
       "{projectRoot}/eslint.config.js"
     ],
-    "production": [
-      "default",
-      "!{projectRoot}/__tests__/**/*",
-      "!{projectRoot}/jest.setup.ts"
-    ]
+    "production": ["default", "!{projectRoot}/__tests__/**/*", "!{projectRoot}/jest.setup.ts"]
   },
   "targetDefaults": {
     "typecheck": {
       "cache": true,
-      "inputs": [
-        "default"
-      ]
+      "inputs": ["default"]
     },
     "lint": {
       "cache": true,
-      "inputs": [
-        "default"
-      ]
+      "inputs": ["default"]
     },
     "test": {
       "cache": true,
-      "inputs": [
-        "default"
-      ]
+      "inputs": ["default"]
     },
     "bundle": {
       "cache": true,
-      "inputs": [
-        "production"
-      ]
+      "inputs": ["production"]
     }
-  }
+  },
+  "analytics": true
 }
