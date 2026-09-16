@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultProject": "toohard",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "!{projectRoot}/**/*.md",
+      "!{projectRoot}/.vscode/**/*",
+      "sharedGlobals"
+    ],
+    "sharedGlobals": [
+      "{projectRoot}/tsconfig.json",
+      "{projectRoot}/package.json",
+      "{projectRoot}/app.json",
+      "{projectRoot}/eslint.config.js"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/__tests__/**/*",
+      "!{projectRoot}/jest.setup.ts"
+    ]
+  },
+  "targetDefaults": {
+    "typecheck": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "test": {
+      "cache": true,
+      "inputs": [
+        "default"
+      ]
+    },
+    "bundle": {
+      "cache": true,
+      "inputs": [
+        "production"
+      ]
+    }
+  }
+}

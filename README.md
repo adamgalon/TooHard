@@ -24,17 +24,27 @@ lighter variants). Everything lives on the device: no account, no backend, no sy
 
 ```bash
 npm install
-npm start          # Expo dev server; press i / a, or scan with Expo Go
-npm run ios        # or: npm run android
+npx nx start              # Expo dev server; press i / a, or scan with Expo Go
+npx nx ios                # or: npx nx android
 ```
 
-Quality gates — all three are green on `main`:
+Every task is an Nx target, so one command runs all the quality gates — and
+re-runs are cached, so an unchanged check takes milliseconds rather than seconds:
 
 ```bash
-npm run typecheck  # tsc --noEmit
-npm run lint       # eslint, zero warnings allowed
-npm test           # 29 tests: domain, application, stores, and a full-app render
+npx nx verify             # typecheck + lint + test, cached
+npx nx typecheck          # tsc --noEmit
+npx nx lint               # eslint, zero warnings allowed
+npx nx test               # 29 tests: domain, application, stores, full-app render
+npx nx bundle             # prove it still bundles, without opening a simulator
+npx nx show project toohard --web   # every target, in a browser
 ```
+
+The plain npm scripts still work (`npm start`, `npm test`, `npm run verify`) — Nx
+wraps them rather than replacing them, and nothing was restructured to add it.
+Editing a `.md` file does not invalidate the cache, so docs churn never costs a
+re-run. In VS Code, `.vscode/tasks.json` exposes the same commands: **⇧⌘B** runs
+`verify`, and the Nx Console extension lists every target in the sidebar.
 
 ## Architecture
 

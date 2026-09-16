@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Nx
+.nx/cache
+.nx/workspace-data
+.nx/bundle-check

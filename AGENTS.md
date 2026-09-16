@@ -30,5 +30,5 @@ the design is wrong, not the rule.
 ## Before finishing
 
 ```bash
-npm run typecheck && npm run lint && npm test
+npx nx verify   # typecheck + lint + test (cached; equivalent npm scripts also work)
 ```

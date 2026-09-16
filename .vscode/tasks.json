@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "App: start (Expo)",
+      "type": "shell",
+      "command": "npx nx run toohard:start",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "App: iOS simulator",
+      "type": "shell",
+      "command": "npx nx run toohard:ios",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "App: Android",
+      "type": "shell",
+      "command": "npx nx run toohard:android",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Check: verify everything",
+      "type": "shell",
+      "command": "npx nx run toohard:verify",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Check: test (watch)",
+      "type": "shell",
+      "command": "npx jest --watch",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
