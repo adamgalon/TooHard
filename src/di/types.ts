@@ -14,6 +14,9 @@ import type { GetCalendarUseCase } from '@application/use-cases/GetCalendar';
 import type { GetStatisticsUseCase } from '@application/use-cases/GetStatistics';
 import type { EndChallengeUseCase } from '@application/use-cases/EndChallenge';
 import type { LoadSettingsUseCase, UpdateSettingsUseCase } from '@application/use-cases/ManageSettings';
+import type { BackupDataUseCase } from '@application/use-cases/BackupData';
+import type { RestoreDataUseCase } from '@application/use-cases/RestoreData';
+import type { GetPhotoTimelineUseCase } from '@application/use-cases/GetPhotoTimeline';
 
 /**
  * Everything the presentation layer is allowed to reach for. Screens receive
@@ -32,6 +35,9 @@ export interface UseCases {
   readonly endChallenge: EndChallengeUseCase;
   readonly loadSettings: LoadSettingsUseCase;
   readonly updateSettings: UpdateSettingsUseCase;
+  readonly backupData: BackupDataUseCase;
+  readonly restoreData: RestoreDataUseCase;
+  readonly getPhotoTimeline: GetPhotoTimelineUseCase;
 }
 
 export interface AppContainer {

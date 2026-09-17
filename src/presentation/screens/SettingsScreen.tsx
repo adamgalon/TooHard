@@ -18,6 +18,9 @@ export const SettingsScreen = () => {
   const update = useSettings((state) => state.update);
   const dashboard = useChallenge((state) => state.dashboard);
   const endChallenge = useChallenge((state) => state.endChallenge);
+  const backupData = useChallenge((state) => state.backupData);
+  const restoreData = useChallenge((state) => state.restoreData);
+  const backupInFlight = useChallenge((state) => state.backupInFlight);
 
   const shiftReminder = (deltaMinutes: number): void => {
     const total = (settings.reminder.hour * 60 + settings.reminder.minute + deltaMinutes + 1440) % 1440;
@@ -31,6 +34,17 @@ export const SettingsScreen = () => {
       [
         { text: 'Keep going', style: 'cancel' },
         { text: 'End challenge', style: 'destructive', onPress: () => void endChallenge() },
+      ],
+    );
+  };
+
+  const confirmRestore = (): void => {
+    Alert.alert(
+      'Restore from backup?',
+      'This replaces everything currently on your device — your active challenge, every daily log, and your settings — with what is in the backup file you pick next.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Choose a file…', style: 'destructive', onPress: () => void restoreData() },
       ],
     );
   };
@@ -90,6 +104,26 @@ export const SettingsScreen = () => {
           description="A tap when a task lands, a jolt when a day is lost."
           value={settings.hapticsEnabled}
           onValueChange={(hapticsEnabled) => void update({ hapticsEnabled })}
+        />
+      </Card>
+
+      <Card style={styles.section}>
+        <AppText variant="heading">Your data</AppText>
+        <AppText variant="caption" color="muted">
+          Everything stays on this device. Back up to a file you control — iCloud Drive, Google
+          Drive, AirDrop — so a lost phone doesn&apos;t mean a lost streak.
+        </AppText>
+        <Button
+          label="Back up now"
+          variant="secondary"
+          loading={backupInFlight}
+          onPress={() => void backupData()}
+        />
+        <Button
+          label="Restore from a backup"
+          variant="secondary"
+          loading={backupInFlight}
+          onPress={confirmRestore}
         />
       </Card>
 

@@ -1,4 +1,7 @@
 import type { Result } from '@core/result/Result';
+import type { Challenge } from '@domain/challenge/Challenge';
+import type { DailyLog } from '@domain/challenge/DailyLog';
+import type { AppSettings } from '@domain/settings/AppSettings';
 
 export type PhotoSource = 'camera' | 'library';
 
@@ -33,4 +36,31 @@ export type FeedbackKind = 'success' | 'warning' | 'error' | 'selection' | 'impa
 
 export interface HapticFeedback {
   trigger(kind: FeedbackKind): void;
+}
+
+/**
+ * Everything a backup needs to restore the app to its current state: the
+ * challenge (across every attempt it's had, not just the active one — see
+ * `BackupDataUseCase`), every daily log, and settings. Plain domain types,
+ * not storage records — turning this into a portable file format is the
+ * adapter's job, not the use case's (see `ArchitectureRules` in AGENTS.md:
+ * application code doesn't know about JSON envelopes or Zod schemas).
+ */
+export interface BackupBundle {
+  readonly challenge: Challenge | null;
+  readonly dailyLogs: readonly DailyLog[];
+  readonly settings: AppSettings;
+  readonly exportedAt: string;
+}
+
+export interface BackupFileInfo {
+  readonly fileName: string;
+}
+
+/** Port over turning a `BackupBundle` into a file the user controls, and back. */
+export interface BackupIO {
+  /** Serializes the bundle and hands it to the OS share sheet. */
+  writeAndShare(bundle: BackupBundle): Promise<Result<BackupFileInfo>>;
+  /** Opens a file picker; resolves to `null` if the user cancels it. */
+  pickAndRead(): Promise<Result<BackupBundle | null>>;
 }

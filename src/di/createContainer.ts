@@ -12,6 +12,7 @@ import type {
   SettingsRepository,
 } from '@domain/ports/Repositories';
 import type {
+  BackupIO,
   HapticFeedback,
   PhotoCapture,
   PhotoStorage,
@@ -30,6 +31,9 @@ import { GetCalendarUseCase } from '@application/use-cases/GetCalendar';
 import { GetStatisticsUseCase } from '@application/use-cases/GetStatistics';
 import { EndChallengeUseCase } from '@application/use-cases/EndChallenge';
 import { LoadSettingsUseCase, UpdateSettingsUseCase } from '@application/use-cases/ManageSettings';
+import { BackupDataUseCase } from '@application/use-cases/BackupData';
+import { RestoreDataUseCase } from '@application/use-cases/RestoreData';
+import { GetPhotoTimelineUseCase } from '@application/use-cases/GetPhotoTimeline';
 import { AsyncStorageKeyValueStore } from '@infrastructure/storage/AsyncStorageKeyValueStore';
 import type { KeyValueStore } from '@infrastructure/storage/KeyValueStore';
 import { PersistentChallengeRepository } from '@infrastructure/persistence/PersistentChallengeRepository';
@@ -42,6 +46,7 @@ import {
   NoopReminderScheduler,
 } from '@infrastructure/notifications/ExpoReminderScheduler';
 import { ExpoHapticFeedback } from '@infrastructure/feedback/ExpoHapticFeedback';
+import { ExpoBackupIO, NoopBackupIO } from '@infrastructure/backup/ExpoBackupIO';
 import { RandomIdGenerator } from '@infrastructure/system/RandomIdGenerator';
 import { Cell } from '@di/Cell';
 import type { AppContainer } from '@di/types';
@@ -60,6 +65,7 @@ export interface ContainerOverrides {
   photoCapture?: PhotoCapture;
   photoStorage?: PhotoStorage;
   reminders?: ReminderScheduler;
+  backupIO?: BackupIO;
   challenges?: ChallengeRepository;
   logs?: DailyLogRepository;
   settings?: SettingsRepository;
@@ -92,6 +98,7 @@ export const createContainer = (overrides: ContainerOverrides = {}): AppContaine
     overrides.photoStorage ?? (isWeb ? new PassThroughPhotoStorage() : new ExpoPhotoStorage());
   const reminders =
     overrides.reminders ?? (isWeb ? new NoopReminderScheduler() : new ExpoReminderScheduler());
+  const backupIO = overrides.backupIO ?? (isWeb ? new NoopBackupIO() : new ExpoBackupIO());
 
   const strategies = createDefaultTaskStrategyRegistry();
   const policies = createDefaultFailurePolicyRegistry();
@@ -156,6 +163,9 @@ export const createContainer = (overrides: ContainerOverrides = {}): AppContaine
       endChallenge: new EndChallengeUseCase(context, challenges, logs, events),
       loadSettings: new LoadSettingsUseCase(settings),
       updateSettings: new UpdateSettingsUseCase(settings, reminders, logger),
+      backupData: new BackupDataUseCase(challenges, logs, settings, backupIO, clock),
+      restoreData: new RestoreDataUseCase(challenges, logs, settings, backupIO),
+      getPhotoTimeline: new GetPhotoTimelineUseCase(context, logs),
     },
     dispose: () => subscriptions.forEach((unsubscribe) => unsubscribe()),
   };

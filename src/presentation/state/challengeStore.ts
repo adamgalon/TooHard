@@ -5,7 +5,7 @@ import type { Result } from '@core/result/Result';
 import type { ProgramId } from '@domain/challenge/ChallengeProgram';
 import type { PhotoSource } from '@domain/ports/Services';
 import type { TaskId, TaskInput } from '@domain/tasks/Task';
-import type { CalendarView, DashboardView } from '@application/dto/Views';
+import type { CalendarView, DashboardView, PhotoTimelineView } from '@application/dto/Views';
 import type { StatisticsView } from '@application/use-cases/GetStatistics';
 import type { AppContainer } from '@di/types';
 
@@ -22,10 +22,13 @@ export interface ChallengeState {
   readonly dashboard: DashboardView | null;
   readonly calendar: CalendarView | null;
   readonly statistics: StatisticsView | null;
+  readonly photoTimeline: PhotoTimelineView | null;
   readonly error: AppError | null;
   readonly notice: Notice | null;
   /** Tasks with an in-flight command, so their controls can be disabled. */
   readonly pendingTasks: readonly TaskId[];
+  /** True while a backup/restore round trip to the OS is in flight. */
+  readonly backupInFlight: boolean;
 }
 
 export interface ChallengeActions {
@@ -36,6 +39,8 @@ export interface ChallengeActions {
   capturePhoto(taskId: TaskId, source: PhotoSource): Promise<void>;
   saveNote(note: string | null): Promise<void>;
   endChallenge(): Promise<void>;
+  backupData(): Promise<void>;
+  restoreData(): Promise<void>;
   dismissNotice(): void;
   clearError(): void;
 }
@@ -47,9 +52,11 @@ const INITIAL: ChallengeState = {
   dashboard: null,
   calendar: null,
   statistics: null,
+  photoTimeline: null,
   error: null,
   notice: null,
   pendingTasks: [],
+  backupInFlight: false,
 };
 
 /**
@@ -73,13 +80,15 @@ export const createChallengeStore = (container: AppContainer): ChallengeStore =>
     };
 
     const loadSecondaryViews = async (): Promise<void> => {
-      const [calendar, statistics] = await Promise.all([
+      const [calendar, statistics, photoTimeline] = await Promise.all([
         useCases.getCalendar.execute(),
         useCases.getStatistics.execute(),
+        useCases.getPhotoTimeline.execute(),
       ]);
       set({
         calendar: calendar.ok ? calendar.value : null,
         statistics: statistics.ok ? statistics.value : null,
+        photoTimeline: photoTimeline.ok ? photoTimeline.value : null,
       });
     };
 
@@ -179,6 +188,33 @@ export const createChallengeStore = (container: AppContainer): ChallengeStore =>
         const ended = await useCases.endChallenge.execute();
         if (!ended.ok) return fail(ended.error);
         set({ ...INITIAL, phase: 'ready' });
+      },
+
+      async backupData() {
+        set({ backupInFlight: true });
+        const result = await useCases.backupData.execute();
+        set({ backupInFlight: false });
+        if (!result.ok) return fail(result.error);
+        set({ notice: { tone: 'success', title: 'Backup saved', message: result.value.fileName } });
+      },
+
+      async restoreData() {
+        set({ backupInFlight: true });
+        const result = await useCases.restoreData.execute();
+        set({ backupInFlight: false });
+        if (!result.ok) return fail(result.error);
+        // `restored: false` means the user backed out of the file picker —
+        // nothing changed, nothing to reload, nothing to announce.
+        if (!result.value.restored) return;
+
+        set({
+          notice: {
+            tone: 'success',
+            title: 'Restored',
+            message: `${result.value.logCount} day(s) of history brought back.`,
+          },
+        });
+        await loadEverything();
       },
 
       dismissNotice() {

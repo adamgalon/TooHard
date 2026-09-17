@@ -26,7 +26,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "POST_NOTIFICATIONS", "VIBRATE"]
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS",
+        "VIBRATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -49,7 +54,8 @@
         }
       ],
       "expo-notifications",
-      "expo-file-system"
+      "expo-file-system",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": false

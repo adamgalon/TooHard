@@ -3,7 +3,7 @@ import { SilentLogger } from '@core/logger/Logger';
 import type { DomainEventMap } from '@domain/events/DomainEvents';
 import { FixedClock } from '@domain/ports/Clock';
 import { PROGRAM_IDS } from '@domain/challenge/ChallengeProgram';
-import type { CapturedPhoto, PhotoCapture, PhotoSource } from '@domain/ports/Services';
+import type { BackupBundle, BackupFileInfo, BackupIO, CapturedPhoto, PhotoCapture, PhotoSource } from '@domain/ports/Services';
 import { ok, type Result } from '@core/result/Result';
 import { createContainer } from '@di/createContainer';
 import type { AppContainer } from '@di/types';
@@ -21,10 +21,43 @@ export class StubPhotoCapture implements PhotoCapture {
   }
 }
 
+/**
+ * A tiny in-memory "file system": `writeAndShare` remembers the bundle, and
+ * `pickAndRead` returns it back by default — simulating the natural case of
+ * a user picking the file the app just exported. Tests can override the next
+ * pick to simulate cancelling the picker or restoring a different file.
+ */
+export class StubBackupIO implements BackupIO {
+  private lastWritten: BackupBundle | null = null;
+  private queued: 'lastWritten' | 'cancel' | { bundle: BackupBundle } = 'lastWritten';
+
+  async writeAndShare(bundle: BackupBundle): Promise<Result<BackupFileInfo>> {
+    this.lastWritten = bundle;
+    return ok({ fileName: 'stub-backup.json' });
+  }
+
+  async pickAndRead(): Promise<Result<BackupBundle | null>> {
+    if (this.queued === 'cancel') return ok(null);
+    if (this.queued === 'lastWritten') return ok(this.lastWritten);
+    return ok(this.queued.bundle);
+  }
+
+  /** The next restore reports that the user backed out of the file picker. */
+  queueCancel(): void {
+    this.queued = 'cancel';
+  }
+
+  /** The next restore reads this bundle instead of whatever was last written. */
+  queueBundle(bundle: BackupBundle): void {
+    this.queued = { bundle };
+  }
+}
+
 export interface Harness {
   readonly container: AppContainer;
   readonly clock: FixedClock;
   readonly events: InMemoryEventBus<DomainEventMap>;
+  readonly backupIO: StubBackupIO;
 }
 
 /**
@@ -34,6 +67,7 @@ export interface Harness {
 export const createHarness = (startingAt = new Date('2026-01-01T09:00:00Z')): Harness => {
   const clock = new FixedClock(startingAt);
   const events = new InMemoryEventBus<DomainEventMap>();
+  const backupIO = new StubBackupIO();
 
   const container = createContainer({
     store: new InMemoryKeyValueStore(),
@@ -45,9 +79,10 @@ export const createHarness = (startingAt = new Date('2026-01-01T09:00:00Z')): Ha
     photoCapture: new StubPhotoCapture(),
     photoStorage: new PassThroughPhotoStorage(),
     reminders: new NoopReminderScheduler(),
+    backupIO,
   });
 
-  return { container, clock, events };
+  return { container, clock, events, backupIO };
 };
 
 export const CLASSIC = PROGRAM_IDS.classic;
