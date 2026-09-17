@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { AppText } from '@presentation/components/AppText';
 import { CalendarScreen } from '@presentation/screens/CalendarScreen';
+import { PhotoTimelineScreen } from '@presentation/screens/PhotoTimelineScreen';
 import { SettingsScreen } from '@presentation/screens/SettingsScreen';
 import { StatsScreen } from '@presentation/screens/StatsScreen';
 import { TodayScreen } from '@presentation/screens/TodayScreen';
@@ -37,6 +38,9 @@ export const MainTabs = () => {
         }} />
       <Tab.Screen name="Wall" component={CalendarScreen} options={{
           tabBarIcon: ({ focused }) => <TabIcon glyph="🧱" focused={focused} />,
+        }} />
+      <Tab.Screen name="Photos" component={PhotoTimelineScreen} options={{
+          tabBarIcon: ({ focused }) => <TabIcon glyph="📸" focused={focused} />,
         }} />
       <Tab.Screen name="Progress" component={StatsScreen} options={{
           tabBarIcon: ({ focused }) => <TabIcon glyph="📈" focused={focused} />,

@@ -3,6 +3,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 export type MainTabParamList = {
   Today: undefined;
   Wall: undefined;
+  Photos: undefined;
   Progress: undefined;
   Settings: undefined;
 };

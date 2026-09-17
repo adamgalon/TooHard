@@ -68,3 +68,16 @@ export interface CalendarView {
   readonly totalDays: number;
   readonly cells: readonly CalendarCell[];
 }
+
+export interface PhotoTimelineEntry {
+  readonly date: CalendarDate;
+  readonly dayNumber: number;
+  readonly photoUri: string;
+}
+
+export interface PhotoTimelineView {
+  /** Oldest first, matching every other date-ordered view in the app. */
+  readonly entries: readonly PhotoTimelineEntry[];
+  /** `null` when there are fewer than two photos to compare. */
+  readonly beforeAfter: { readonly before: PhotoTimelineEntry; readonly after: PhotoTimelineEntry } | null;
+}
