@@ -1,0 +1,42 @@
+name: CI
+
+# Runs the same gates documented in AGENTS.md's "Before finishing" section —
+# this workflow exists so a regression is caught here, not the next time
+# someone (human or agent) happens to run `nx verify` locally.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # Separate, named steps rather than one `nx verify` call: a failure
+      # shows up as its own red X in the GitHub UI without needing to open
+      # logs to see which of typecheck/lint/test/bundle actually broke.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Bundle (catches real import/resolution errors)
+        run: npx expo export --platform ios --output-dir /tmp/ci-bundle-check
