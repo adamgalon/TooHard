@@ -1,5 +1,7 @@
 # Too Hard
 
+[![CI](https://github.com/adamgalon/TooHard/actions/workflows/ci.yml/badge.svg)](https://github.com/adamgalon/TooHard/actions/workflows/ci.yml)
+
 A cross-platform React Native app for running a 75-day challenge (75 Hard and two
 lighter variants). Everything lives on the device: no account, no backend, no sync.
 
@@ -9,16 +11,16 @@ lighter variants). Everything lives on the device: no account, no backend, no sy
 
 ## Stack
 
-| Concern | Choice |
-| --- | --- |
-| Runtime | Expo SDK 57 / React Native 0.86 / React 19 |
-| Language | TypeScript (strict, no unused locals/params, path aliases) |
-| Navigation | React Navigation 7 (native stack + bottom tabs) |
-| State | Zustand (vanilla stores, injected — never module singletons) |
-| Persistence | AsyncStorage behind a `KeyValueStore` port, Zod-validated |
+| Concern        | Choice                                                                |
+| -------------- | --------------------------------------------------------------------- |
+| Runtime        | Expo SDK 57 / React Native 0.86 / React 19                            |
+| Language       | TypeScript (strict, no unused locals/params, path aliases)            |
+| Navigation     | React Navigation 7 (native stack + bottom tabs)                       |
+| State          | Zustand (vanilla stores, injected — never module singletons)          |
+| Persistence    | AsyncStorage behind a `KeyValueStore` port, Zod-validated             |
 | Media / system | expo-image-picker, expo-file-system, expo-notifications, expo-haptics |
-| Testing | Jest (jest-expo) + React Native Testing Library 14 |
-| Quality | ESLint flat config (incl. layer-boundary rules) + Prettier |
+| Testing        | Jest (jest-expo) + React Native Testing Library 14                    |
+| Quality        | ESLint flat config (incl. layer-boundary rules) + Prettier            |
 
 ## Getting started
 
@@ -41,8 +43,8 @@ npx nx show project toohard --web   # every target, in a browser
 ```
 
 `npx nx ios` boots a simulator itself before handing over to Expo. Expo installs
-Expo Go with `xcrun simctl install`, which fails with *"Unable to lookup in current
-state: Shutdown"* when no device is booted, so [`scripts/run-ios.mjs`](scripts/run-ios.mjs)
+Expo Go with `xcrun simctl install`, which fails with _"Unable to lookup in current
+state: Shutdown"_ when no device is booted, so [`scripts/run-ios.mjs`](scripts/run-ios.mjs)
 boots the newest available iPhone runtime and waits until it really reports `Booted`.
 Pick a specific device with `npx nx ios --device "iPhone 17 Pro"` or `IOS_SIMULATOR=…`.
 
@@ -97,20 +99,20 @@ src/
 
 ## Design patterns, and why each one is here
 
-| Pattern | Where | Why it earns its place |
-| --- | --- | --- |
-| **Ports & adapters** | [`domain/ports/`](src/domain/ports/), [`infrastructure/`](src/infrastructure/) | Business rules never import Expo, so they run in a plain Node test in milliseconds. |
-| **Repository** | [`Repositories.ts`](src/domain/ports/Repositories.ts), [`PersistentDailyLogRepository.ts`](src/infrastructure/persistence/PersistentDailyLogRepository.ts) | Swapping AsyncStorage for SQLite or a sync backend is one new class. |
-| **Strategy** | [`tasks/strategies/`](src/domain/tasks/strategies/) | A checkbox, a counter and a photo behave differently. One class each, no `switch` scattered across screens. |
-| **Strategy (again)** | [`policies/FailurePolicy.ts`](src/domain/challenge/policies/FailurePolicy.ts) | "Miss a day → restart at day 1" vs "miss a day → carry on" is the only difference between 75 Hard and 75 Soft. |
-| **Specification** | [`specifications/`](src/domain/challenge/specifications/) | "This day is complete" is a named, composable, unit-tested object — not an `if` buried in a component. |
-| **Command** | [`application/use-cases/`](src/application/use-cases/) | Every user intention is one object with one `execute`. Screens orchestrate nothing. |
-| **Registry + Factory** | [`TaskStrategyRegistry.ts`](src/domain/tasks/TaskStrategyRegistry.ts) | Resolves a strategy by kind; adding a kind means registering, not editing. |
-| **Data Mapper** | [`persistence/mappers.ts`](src/infrastructure/persistence/mappers.ts) | Entities stay ignorant of their stored shape, so a schema change never leaks inward. |
-| **Observer** | [`core/events/EventBus.ts`](src/core/events/EventBus.ts) | Haptics, logging and (later) analytics react to `day/completed`. The use case that publishes it knows none of them. |
-| **Result type** | [`core/result/Result.ts`](src/core/result/Result.ts) | Failure is a value with a type, not an exception thrown across four layers. |
-| **Dependency injection** | [`di/createContainer.ts`](src/di/createContainer.ts) | Constructor injection everywhere; tests build the same app from in-memory doubles. |
-| **Read models / DTOs** | [`application/dto/`](src/application/dto/) | Components render `DashboardView`, never an entity — so persistence changes cannot ripple into JSX. |
+| Pattern                  | Where                                                                                                                                                      | Why it earns its place                                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Ports & adapters**     | [`domain/ports/`](src/domain/ports/), [`infrastructure/`](src/infrastructure/)                                                                             | Business rules never import Expo, so they run in a plain Node test in milliseconds.                                 |
+| **Repository**           | [`Repositories.ts`](src/domain/ports/Repositories.ts), [`PersistentDailyLogRepository.ts`](src/infrastructure/persistence/PersistentDailyLogRepository.ts) | Swapping AsyncStorage for SQLite or a sync backend is one new class.                                                |
+| **Strategy**             | [`tasks/strategies/`](src/domain/tasks/strategies/)                                                                                                        | A checkbox, a counter and a photo behave differently. One class each, no `switch` scattered across screens.         |
+| **Strategy (again)**     | [`policies/FailurePolicy.ts`](src/domain/challenge/policies/FailurePolicy.ts)                                                                              | "Miss a day → restart at day 1" vs "miss a day → carry on" is the only difference between 75 Hard and 75 Soft.      |
+| **Specification**        | [`specifications/`](src/domain/challenge/specifications/)                                                                                                  | "This day is complete" is a named, composable, unit-tested object — not an `if` buried in a component.              |
+| **Command**              | [`application/use-cases/`](src/application/use-cases/)                                                                                                     | Every user intention is one object with one `execute`. Screens orchestrate nothing.                                 |
+| **Registry + Factory**   | [`TaskStrategyRegistry.ts`](src/domain/tasks/TaskStrategyRegistry.ts)                                                                                      | Resolves a strategy by kind; adding a kind means registering, not editing.                                          |
+| **Data Mapper**          | [`persistence/mappers.ts`](src/infrastructure/persistence/mappers.ts)                                                                                      | Entities stay ignorant of their stored shape, so a schema change never leaks inward.                                |
+| **Observer**             | [`core/events/EventBus.ts`](src/core/events/EventBus.ts)                                                                                                   | Haptics, logging and (later) analytics react to `day/completed`. The use case that publishes it knows none of them. |
+| **Result type**          | [`core/result/Result.ts`](src/core/result/Result.ts)                                                                                                       | Failure is a value with a type, not an exception thrown across four layers.                                         |
+| **Dependency injection** | [`di/createContainer.ts`](src/di/createContainer.ts)                                                                                                       | Constructor injection everywhere; tests build the same app from in-memory doubles.                                  |
+| **Read models / DTOs**   | [`application/dto/`](src/application/dto/)                                                                                                                 | Components render `DashboardView`, never an entity — so persistence changes cannot ripple into JSX.                 |
 
 ## How a tap becomes state
 
@@ -133,7 +135,7 @@ TaskCard onPress
   10 pages of non-fiction, progress photo.
 - **Only today is editable.** Past days are locked — back-filling yesterday would turn
   the streak into a story rather than a record.
-- A day is *missed* only once it is in the past and still incomplete. Today is never missed.
+- A day is _missed_ only once it is in the past and still incomplete. Today is never missed.
 - On a missed day, the programme's failure policy decides: 75 Hard restarts at day 1
   (keeping the failed attempt in history), 75 Soft records the miss and carries on.
 - Day rollover is re-evaluated on launch and whenever the app returns to the foreground,
@@ -158,6 +160,7 @@ universe. `FixedClock` makes "75 days later" an instant assertion.
 ## Extending it
 
 **A new task kind** (a timed activity, a GPS-verified run):
+
 1. Add its variant to `TaskDefinition` / `TaskProgress` in [`domain/tasks/Task.ts`](src/domain/tasks/Task.ts).
 2. Write a strategy in [`domain/tasks/strategies/`](src/domain/tasks/strategies/) and register it.
 3. Add one branch to [`TaskCard.tsx`](src/presentation/components/TaskCard.tsx).
