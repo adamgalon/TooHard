@@ -36,7 +36,7 @@ jobs:
         run: npm run lint
 
       - name: Test
-        run: npm test
+        run: npm test -- --coverage
 
       - name: Bundle (catches real import/resolution errors)
         run: npx expo export --platform ios --output-dir /tmp/ci-bundle-check
