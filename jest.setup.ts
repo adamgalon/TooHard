@@ -43,3 +43,16 @@ jest.mock('expo-notifications', () => ({
   AndroidImportance: { DEFAULT: 3 },
   SchedulableTriggerInputTypes: { DAILY: 'daily' },
 }));
+
+// The widget's own file imports @expo/ui/swift-ui components, which is real
+// SwiftUI-bridging code with nothing to render in a Jest environment — the
+// module is stubbed here, one level up, rather than inside the widget file.
+jest.mock('expo-widgets', () => ({
+  createWidget: jest.fn(() => ({
+    updateSnapshot: jest.fn(),
+    updateTimeline: jest.fn(),
+    reload: jest.fn(),
+    getTimeline: jest.fn(async () => []),
+  })),
+  widgetsDirectory: '',
+}));

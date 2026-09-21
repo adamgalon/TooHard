@@ -15,7 +15,8 @@
       "@application/*": ["./src/application/*"],
       "@infrastructure/*": ["./src/infrastructure/*"],
       "@di/*": ["./src/di/*"],
-      "@presentation/*": ["./src/presentation/*"]
+      "@presentation/*": ["./src/presentation/*"],
+      "@widgets/*": ["./widgets/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
