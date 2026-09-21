@@ -26,12 +26,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "CAMERA",
-        "READ_MEDIA_IMAGES",
-        "POST_NOTIFICATIONS",
-        "VIBRATE"
-      ]
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "POST_NOTIFICATIONS", "VIBRATE"]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -55,7 +50,20 @@
       ],
       "expo-notifications",
       "expo-file-system",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "TodayWidget",
+              "displayName": "Today's Progress",
+              "description": "Your day number and streak, at a glance.",
+              "supportedFamilies": ["systemSmall", "systemMedium"]
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false
