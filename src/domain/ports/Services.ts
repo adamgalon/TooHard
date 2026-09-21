@@ -64,3 +64,30 @@ export interface BackupIO {
   /** Opens a file picker; resolves to `null` if the user cancels it. */
   pickAndRead(): Promise<Result<BackupBundle | null>>;
 }
+
+/** One of today's tasks, reduced to what a widget can show at a glance. */
+export interface WidgetTask {
+  readonly emoji: string;
+  readonly title: string;
+  readonly satisfied: boolean;
+}
+
+/** Just enough of today to render the home screen widget. */
+export interface WidgetSnapshot {
+  readonly dayNumber: number;
+  readonly totalDays: number;
+  readonly currentStreak: number;
+  readonly completedDays: number;
+  readonly daysRemaining: number;
+  /** 0…1 */
+  readonly ratio: number;
+  readonly tasks: readonly WidgetTask[];
+}
+
+/**
+ * Port over pushing state to the home screen widget. `null` means no active
+ * challenge — the widget shows an empty/prompt state instead of stale numbers.
+ */
+export interface WidgetSync {
+  updateSnapshot(snapshot: WidgetSnapshot | null): Promise<Result<void>>;
+}
