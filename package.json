@@ -32,7 +32,7 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
-    "@react-native/jest-preset": "^0.86.3",
+    "@react-native/jest-preset": "^0.87.1",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "30.0.0",
     "@types/react": "~19.2.2",
