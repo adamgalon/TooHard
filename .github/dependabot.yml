@@ -28,6 +28,20 @@ updates:
       - dependency-name: "@react-native-async-storage/*"
       - dependency-name: "@react-navigation/*"
 
+      # The linting stack is capped by what eslint-config-expo's dependency
+      # chain supports, not by what npm publishes:
+      #   - ESLint 10 removed `context.getFilename()`, which
+      #     eslint-plugin-react still calls — it has no v10-compatible
+      #     release, so ESLint 10 crashes before it lints a single file.
+      #   - typescript-eslint hard-throws on TS >= 7.0; its peer range is
+      #     `>=4.8.4 <6.1.0`, so TS 7 is a build break, not a warning.
+      # Lift these once eslint-plugin-react ships ESLint 10 support and
+      # typescript-eslint ships TS 7 support (typescript-eslint#10940).
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
