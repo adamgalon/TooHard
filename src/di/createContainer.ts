@@ -17,6 +17,7 @@ import type {
   PhotoCapture,
   PhotoStorage,
   ReminderScheduler,
+  WidgetSync,
 } from '@domain/ports/Services';
 import type { IdGenerator } from '@domain/shared/Identifier';
 import { createDefaultTaskStrategyRegistry } from '@domain/tasks/TaskStrategyRegistry';
@@ -47,6 +48,7 @@ import {
 } from '@infrastructure/notifications/ExpoReminderScheduler';
 import { ExpoHapticFeedback } from '@infrastructure/feedback/ExpoHapticFeedback';
 import { ExpoBackupIO, NoopBackupIO } from '@infrastructure/backup/ExpoBackupIO';
+import { ExpoWidgetSync, NoopWidgetSync } from '@infrastructure/widget/ExpoWidgetSync';
 import { RandomIdGenerator } from '@infrastructure/system/RandomIdGenerator';
 import { Cell } from '@di/Cell';
 import type { AppContainer } from '@di/types';
@@ -66,6 +68,7 @@ export interface ContainerOverrides {
   photoStorage?: PhotoStorage;
   reminders?: ReminderScheduler;
   backupIO?: BackupIO;
+  widgetSync?: WidgetSync;
   challenges?: ChallengeRepository;
   logs?: DailyLogRepository;
   settings?: SettingsRepository;
@@ -79,6 +82,7 @@ export interface ContainerOverrides {
  */
 export const createContainer = (overrides: ContainerOverrides = {}): AppContainer => {
   const isWeb = Platform.OS === 'web';
+  const isIOS = Platform.OS === 'ios';
 
   const store = overrides.store ?? new AsyncStorageKeyValueStore();
   const clock = overrides.clock ?? new SystemClock();
@@ -99,6 +103,8 @@ export const createContainer = (overrides: ContainerOverrides = {}): AppContaine
   const reminders =
     overrides.reminders ?? (isWeb ? new NoopReminderScheduler() : new ExpoReminderScheduler());
   const backupIO = overrides.backupIO ?? (isWeb ? new NoopBackupIO() : new ExpoBackupIO());
+  // The widget target only exists on iOS (see app.json's expo-widgets config).
+  const widgetSync = overrides.widgetSync ?? (isIOS ? new ExpoWidgetSync() : new NoopWidgetSync());
 
   const strategies = createDefaultTaskStrategyRegistry();
   const policies = createDefaultFailurePolicyRegistry();
@@ -112,6 +118,34 @@ export const createContainer = (overrides: ContainerOverrides = {}): AppContaine
     events,
   );
 
+  /**
+   * Keeps the home screen widget honest: re-reads today's numbers and pushes
+   * them after anything that could change what it shows. `null` clears it to
+   * the "no active challenge" state.
+   */
+  const syncWidget = async (): Promise<void> => {
+    const loaded = await context.load();
+    if (!loaded.ok || loaded.value === null) {
+      await widgetSync.updateSnapshot(null);
+      return;
+    }
+    const dashboard = await context.assembleDashboard(loaded.value);
+    if (!dashboard.ok) return;
+    await widgetSync.updateSnapshot({
+      dayNumber: dashboard.value.dayNumber,
+      totalDays: dashboard.value.totalDays,
+      currentStreak: dashboard.value.currentStreak,
+      completedDays: dashboard.value.completedDays,
+      daysRemaining: dashboard.value.daysRemaining,
+      ratio: dashboard.value.today.ratio,
+      tasks: dashboard.value.today.tasks.map((task) => ({
+        emoji: task.emoji,
+        title: task.title,
+        satisfied: task.satisfied,
+      })),
+    });
+  };
+
   const subscriptions: Unsubscribe[] = [
     // Observer wiring: feedback reacts to facts instead of being called from
     // inside the use cases.
@@ -121,7 +155,19 @@ export const createContainer = (overrides: ContainerOverrides = {}): AppContaine
     events.subscribe('day/taskUpdated', ({ satisfied }) =>
       haptics.trigger(satisfied ? 'impact' : 'selection'),
     ),
+    events.subscribe('challenge/started', () => void syncWidget()),
+    events.subscribe('challenge/restarted', () => void syncWidget()),
+    events.subscribe('challenge/completed', () => void syncWidget()),
+    events.subscribe('challenge/abandoned', () => void syncWidget()),
+    events.subscribe('day/taskUpdated', () => void syncWidget()),
+    events.subscribe('day/completed', () => void syncWidget()),
+    events.subscribe('day/missed', () => void syncWidget()),
   ];
+
+  // Push a fresh snapshot on every cold start too, not just on the next
+  // change — otherwise a widget added right after opening the app would sit
+  // on stale (or no) data until something happens to trigger an event.
+  void syncWidget();
 
   if (__DEV__) {
     const observed: (keyof DomainEventMap)[] = [

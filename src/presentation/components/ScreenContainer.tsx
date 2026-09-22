@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { Keyboard, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { makeStyles, useTheme } from '@presentation/theme/ThemeProvider';
@@ -38,11 +38,19 @@ export const ScreenContainer = ({
       style={styles.root}
       contentContainerStyle={[styles.padded, padding]}
       keyboardShouldPersistTaps="handled"
+      // The keyboard can cover most of the screen (a multiline note field has
+      // no return-key way to close it), so the scroll gesture itself — not
+      // just a tap on whatever sliver of empty space is left — dismisses it.
+      onScrollBeginDrag={Keyboard.dismiss}
       showsVerticalScrollIndicator={false}
       refreshControl={
-        onRefresh
-          ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.accent} />
-          : undefined
+        onRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.accent}
+          />
+        ) : undefined
       }
     >
       {children}
