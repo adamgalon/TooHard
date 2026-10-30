@@ -41,7 +41,7 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jest": "~30.5.2",
-    "jest-expo": "~57.0.5",
+    "jest-expo": "~58.0.12",
     "lint-staged": "^17.6.0",
     "nx": "^23.3.0",
     "patch-package": "^8.0.1",
